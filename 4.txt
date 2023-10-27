@@ -1,0 +1,103 @@
+Задание 1:
+use my_bd
+show tables;
+desc user_private_message;
+
+Задание 2:
+SELECT name FROM discussion_group WHERE approve_required = 1 OR approve_required = true;
+
+Задание 3:
+select greatest(message_id, user_from_id, user_to_id) ID, date(read_time) "READ", date(send_time) "SEND",
+message_text TEXT from user_private_message where send_time between '2020-11-01' and '2020-11-30' AND 
+message_text like'A%' AND DATEDIFF(read_time, send_time)<10;
+
+Задание 4:
+select sum(approved) "approved_cnt", min(joined_time) "oldest_join", max(approved_time) "recent_approve"
+from users_to_discussion_groups;
+
+Задание 5:
+select user_id, approved_time 'registration_time'
+from users_to_discussion_groups
+order by approved_time desc
+limit 20;
+
+Задание 6:
+with group_with_approve as (select * from discussion_group where approve_required=1), 
+new_groups as (select group_id from group_with_approve where creation_time>'2020-01-01') select * from new_groups;
+
+
+Задание 7:
+select admin_user_id ID
+from discussion_group
+union
+select user_from_id ID
+from user_private_message;
+
+Задание 8:
+mysql> with cntsum as (select date(send_time) time ,  user_from_id, count(1) as cnt from 
+user_private_message group by date(send_time), user_from_id)
+ select count(*) user, sum(cnt) message, time from cntsum group by time having user=message;
+
+Задание 9:   
+docker exec -it my-mongo mongo
+> use my_db
+switched to db my_db
+> show collections
+posts
+users
+
+Задание 10:
+db.posts.find({"topics": "as", "author":/.*example.ru.*/, "score": {$gt: 100}})
+
+Задание 11:
+db.posts.insertMany([{creation_date: new Date(),author: "skbx@example.com",topics: ["mongodb"]},{creation_date: new Date("2021-12-31"), author: "skbx@example.ru"}])
+
+Задание 12:
+db.users.aggregate( [ {$match : {"visits" : {$gt : 300}}}, {$project: {karma : "$karma", first_name : {$substr : ["$first_name", 0, 1]}}}, {$group : {_id : "$first_name", sum : {$sum : "$karma"}}}])
+
+Задание 13:
+docker exec -it my-redis redis-cli
+set index "index precalculated content"
+exists index
+ttl index
+set index "index precalculated content" ex 120
+persist index
+
+Задание 14:
+zadd ratings 10 mysql
+zadd ratings 20 postgresql
+zadd ratings 30 mongodb
+zadd ratings 40 redis
+
+> zrange ratings 0 10 rev withscores - вывод
+1) "redis"
+2) "40"
+3) "mongodb"
+4) "30"
+5) "postgresql"
+6) "20"
+7) "mysql"
+8) "10"
+
+> zadd ratings INCR 15 mysql
+
+> zrange ratings 0 10 rev withscores - вывод
+1) "redis"
+2) "40"
+3) "mongodb"
+4) "30"
+5) "postgresql"
+6) "20"
+7) "mysql"
+8) "25"
+
+> zpopmax ratings
+1) "redis"
+2) "40"
+
+> zrank ratings mysql
+(integer) 1
+
+Задание 15:
+> psubscribe events*
+> publish events42 "Hello there"
