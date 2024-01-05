@@ -1,0 +1,22 @@
+import random
+import telebot
+
+bot = telebot.TeleBot("6445693278:AAF7I7uXOsyv6m5YD9KnyGeHFFquFJSoWgA")
+
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "Привет! Я бот, который рассказывает случайные анекдоты. Просто напиши мне 'Анекдот', и я поделюсь с тобой шуткой!")
+
+@bot.message_handler(func=lambda message: True)
+def send_anecdote(message):
+    if message.text.lower() == 'анекдот':
+        anecdotes = [
+            "- Тараканы в доме есть?\n-Нет, их пауки съели.\n- У Вас пауки есть?\n- Нет, их крысы съели.\n- У Вас крысы есть?!\n- Нет, их Валентин Геннадьевич Белов съел.\n- А кто это?\n- Забыл представиться.",
+            "Как говорят врачи\n-Помним\n-Любим\n-аскорбим",
+            "-Любимый, ты не видел мои купоны в солярий?\n-Я их украл и раздал бледным.",
+        ]
+        bot.reply_to(message, random.choice(anecdotes))
+    else:
+        bot.reply_to(message, "Извините, я понимаю только команду 'Анекдот'")
+
+bot.polling()
